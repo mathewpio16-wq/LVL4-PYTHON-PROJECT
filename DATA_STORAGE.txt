@@ -1,0 +1,13 @@
+DFIP DATA STORAGE
+
+Accounts, cases and reports are saved in a persistent per-user folder:
+Windows: %LOCALAPPDATA%\DFIP_Case_Management\dfip_users.db
+Linux/macOS: ~/.local/share/DFIP_Case_Management/dfip_users.db (fallback)
+
+The data is retained after closing the app and after replacing its extracted program folder.
+
+If you have an older dfip_users.db, copy it into the same folder as database.py BEFORE FIRST LAUNCH to migrate it automatically. If you already launched this version, close the app and back up the existing persistent database before manually replacing it. Never overwrite a database without backing it up.
+
+The GitHub ZIP does not include personal database files. To check where your current data is saved, run: python -c "import database; print(database.DB_NAME)" from this application folder.
+
+Note: The Remember Me token is stored in your OS credential manager (when keyring is installed). Accounts remain saved regardless of Remember Me.

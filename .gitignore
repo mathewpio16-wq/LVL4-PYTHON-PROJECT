@@ -1,15 +1,9 @@
-# Database files
 *.db
 *.sqlite
 *.sqlite3
-
-# Python generated files
 __pycache__/
 *.pyc
-
-# Virtual environments
+.env
 .venv/
 venv/
-
-# Environment variables
-.env
+dfip_settings.json

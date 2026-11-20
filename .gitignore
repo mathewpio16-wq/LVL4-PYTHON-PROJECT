@@ -1,0 +1,9 @@
+*.db
+*.sqlite
+*.sqlite3
+__pycache__/
+*.pyc
+.env
+.venv/
+venv/
+dfip_settings.json

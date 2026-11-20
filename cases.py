@@ -1,67 +1,140 @@
+from validation import (
+    validate_case_id,
+    validate_case_title,
+    validate_client_name,
+    validate_description,
+    validate_priority
+)
+
+from database import save_case, get_all_cases
+import sqlite3
+
+
+def create_case(case_data):
+    # Retrieve existing cases from SQLite
+    cases = get_all_cases()
+
+    # Validate the Case ID
+    is_valid, message = validate_case_id(
+        case_data.get("case_id", ""),
+        cases
+    )
+
+    if not is_valid:
+        return False, message
+
+    # Validate the Case Title
+    is_valid, message = validate_case_title(
+        case_data.get("case_title", "")
+    )
+
+    if not is_valid:
+        return False, message
+
+    # Validate the Client Name
+    is_valid, message = validate_client_name(
+        case_data.get("client_name", "")
+    )
+
+    if not is_valid:
+        return False, message
+
+    # Validate the Description
+    is_valid, message = validate_description(
+        case_data.get("description", "")
+    )
+
+    if not is_valid:
+        return False, message
+
+    # Validate the Priority
+    is_valid, message = validate_priority(
+        case_data.get("priority", "")
+    )
+
+    if not is_valid:
+        return False, message
+
+    # Prepare validated case information
+    new_case = {
+        "case_id": int(case_data["case_id"]),
+        "case_title": case_data["case_title"].strip(),
+        "client_name": case_data["client_name"].strip(),
+        "description": case_data["description"].strip(),
+        "priority": int(case_data["priority"]),
+        "status": "Open"
+    }
+
+    # Save the case to SQLite
+    try:
+        save_case(new_case)
+
+    except sqlite3.IntegrityError:
+        return False, "A case with this ID already exists."
+
+    except sqlite3.Error:
+        return False, "Unable to save the case. Please try again."
+
+    return True, "Case added successfully."
+
 def add_case(cases):
     print("\n--- Add New Case ---")
 
-# Validating case ids
     while True:
-        try:
-            case_id = int(input("Enter Case ID: "))
+        case_id_input = input("Enter Case ID: ")
 
-            if case_id <= 0:
-                print("Case ID must be a positive number.")
-                continue
+        is_valid, message = validate_case_id(case_id_input, cases)
 
-# Ensuring there are no duplicate Case IDs
-            duplicate = False
-            for case in cases:
-                if case["case_id"] == case_id:
-                    duplicate = True
-                    break
-
-            if duplicate: 
-                print("A case with this ID already exists")
-                continue
+        if is_valid:
+            case_id = int(case_id_input)
             break
 
-        except ValueError:
-            print("Please enter a valid numeric Case ID. ")
+        print(message)
 
-    # Validating the case titles.
+    # Validating the case title
     while True:
         case_title = input("Enter Case Title: ").strip()
 
-        if case_title:
+        is_valid, message = validate_case_title(case_title)
+
+        if is_valid:
             break
 
-    # Validating the clients name
+        print(message)
+
+        # Validate client name
     while True:
         client_name = input("Enter Client Name: ").strip()
-        
-        if client_name:
+
+        is_valid, message = validate_client_name(client_name)
+
+        if is_valid:
             break
 
-        print("Client name cannot be empty")
+        print(message)
 
-    # Validating the case description
+    # Validate description
     while True:
         description = input("Enter Description: ").strip()
 
-        if description:
+        is_valid, message = validate_description(description)
+
+        if is_valid:
             break
 
-        print("Description cannot be empty")
+        print(message)
 
-    # validating the case priority
+    # Validate priority
     while True:
-        try:
-            priority = int(input("Enter priority (1-3):  "))
+        priority_input = input("Enter Priority (1-3): ")
 
-            if priority in [1, 2, 3]:
-                break
+        is_valid, message = validate_priority(priority_input)
 
-            print("Priority must be between 1 and 3.")
+        if is_valid:
+            priority = int(priority_input)
+            break
 
-        except ValueError:
-            print("Please enter a valid number.")
+        print(message)
 
     # Creating the case dictionary
     new_case = {
@@ -73,11 +146,13 @@ def add_case(cases):
         "status": "Open",
     }
 
-    # Storing a new case
+    # Save the new case to SQLite
+    save_case(new_case)
 
+    # Update the current list
     cases.append(new_case)
 
-    print(f"\nCase {case_id} added successfully!")
+    print(f"\nCase {case_id} added and saved successfully!")
 
 def view_cases(cases):
     print("\n--- All Registered Cases")
@@ -113,7 +188,7 @@ def view_case_by_id(cases, case_id):
     return None
 
 if __name__ == "__main__":
-    cases = []
+    cases = get_all_cases()
 
     add_case(cases)
     add_case(cases)

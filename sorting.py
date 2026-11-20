@@ -1,3 +1,5 @@
+from database import get_all_cases
+
 def bubble_sort_cases(cases):
     sorted_cases = cases.copy()
 
@@ -17,6 +19,15 @@ def bubble_sort_cases(cases):
 
         if not swapped:
             break
+
+    return sorted_cases
+
+
+
+def sort_cases_from_db():
+    cases = get_all_cases()
+
+    sorted_cases = bubble_sort_cases(cases)
 
     return sorted_cases
     
